@@ -21,6 +21,7 @@ import confidenceImg from "../assets/confi.png";
 import resumeImg from "../assets/resume.png";
 import pdfImg from "../assets/pdf.png";
 import analyticsImg from "../assets/history.png";
+import Footer from "../components/Footer";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -160,84 +161,6 @@ const Home = () => {
             ))}
           </div>
 
-          <div className="mb-32">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl font-semibold text-center mb-16"
-            >
-              Advanced AI <span className=" text-green-600">Capabilities</span>
-            </motion.h2>
-
-            <div className="grid md:grid-cols-2 gap-10">
-              {[
-                {
-                  image: evalImg,
-                  icon: <BsBarChart size={20} />,
-                  title: "AI Answer Evaluation",
-                  desc: " Scores communication, technical accuracy and confidence. ",
-                },
-                {
-                  image: resumeImg,
-                  icon: <BsFileEarmarkText size={20} />,
-                  title: "Resume Based Interview",
-                  desc: " Project Specific questions based on uploaded resume. ",
-                },
-                {
-                  image: pdfImg,
-                  icon: <BsFileEarmarkText size={20} />,
-                  title: "Downloaded PDF Report",
-                  desc: " Detailed Strength, weakeness and improvement insights. ",
-                },
-                {
-                  image: analyticsImg,
-                  icon: <BsBarChart size={20} />,
-                  title: "History & Analytics",
-                  desc: " Track progress with performance graphs and topic analysis ",
-                },
-              ].map((item, index) => {
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
-                    className=" bg-white border border-gray-200 rounded-3xl p-8 shadow-sm
-              hover:shadow-xl transition-all "
-                  >
-                    <div className=" flex flex-col md:flex-row items-center gap-8 ">
-                      <div className=" w-full md:w-1/2 flex justify-center">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className=" w-full h-auto object-contain max-h-64 "
-                        />
-                      </div>
-
-                      <div className=" w-full md:w-1/2  ">
-                        <div
-                          className=" bg-green-50 text-green-600 w-12 h-12 
-                    rounded-xl flex items-center justify-center mb-6 "
-                        >
-                          {item.icon}
-                        </div>
-                        <h3 className=" font-semibold mb-3 text-xl ">
-                          {" "}
-                          {item.title}{" "}
-                        </h3>
-                        <p className=" text-gray-500 text-sm leading-relaxed ">
-                          {item.desc}
-                        </p>
-                      </div>
-
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
 
           <div className="mb-32">
             <motion.h2
@@ -310,17 +233,91 @@ const Home = () => {
                           {item.desc}
                         </p>
                       </div>
-
                     </div>
                   </motion.div>
                 );
               })}
             </div>
           </div>
+
+          <div className="mb-32">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl font-semibold text-center mb-16"
+            >
+              Multiple Interview <span className=" text-green-600">Modes</span>
+            </motion.h2>
+
+            <div className="grid md:grid-cols-2 gap-10">
+              {[
+                {
+                  img: hrImg,
+                  title: "HRInterview Mode",
+                  desc: " Behavioral and communication based evaluation . ",
+                },
+                {
+                  img: techImg,
+                  title: "Technical Mode",
+                  desc: " Deep technical questioning based on selected role. ",
+                },
+                {
+                  img: confidenceImg,
+                  title: "Confidence Detection",
+                  desc: " Basic tone and voice analysis insights. ",
+                },
+                {
+                  img: creditImg,
+                  title: "Credits System",
+                  desc: " Unlock premium interview sessions easily .",
+                },
+              ].map((mode, index) => {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ y: -6 }}
+                    className=" bg-white border border-gray-200 rounded-3xl p-8 shadow-sm
+                     hover:shadow-xl transition-all "
+                  >
+                    <div className=" flex  items-center justify-between gap-6 ">
+                     {/* Left Content */}
+                      <div className=" w-1/2 ">
+                        <h3 className=" font-semibold text-xl mb-3 ">
+                          {mode.title}
+                        </h3>
+
+                        <p className=" text-gray-500 text-sm leading-relaxed ">
+                          {mode.desc}
+                        </p>
+                      </div>
+
+                      {/* {"RIGHT IMAGE"} */}
+                      <div className=" w-1/2 flex justify-end  ">
+                        <img
+                          src={mode.img}
+                          alt={mode.title}
+                          className=" w-28 h-28 object-contain  "
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
 
         </div>
       </div>
       {showAuth && <AuthModel onClose={() => setShowAuth(false)} />}
+
+        {/* Footer components called */}
+        <Footer/>
+
     </div>
   );
 };
