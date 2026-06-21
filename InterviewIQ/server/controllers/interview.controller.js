@@ -2,6 +2,7 @@ import fs from "fs";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { askAi } from "../services/openRouter.service.js";
 export const analyzeResume = async (req, res) => {
+
   try {
     if (!req.file) {
       return res.status(400).json({ message: "Resume required" });
@@ -9,7 +10,7 @@ export const analyzeResume = async (req, res) => {
     const filepath = req.file.path;
 
     const fileBuffer = await fs.promises.readFile(filepath);
-    const uint8Array = new Uint8Array(filepath);
+    const uint8Array = new Uint8Array(fileBuffer);
 
     const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
 
@@ -33,7 +34,7 @@ export const analyzeResume = async (req, res) => {
             {
             "role":"string",
             "experience":"string",
-            "project":["project1", "project2"],
+            "projects":["project1", "project2"],
             "skills":["skill1", "skill2"]
             }
             `,
