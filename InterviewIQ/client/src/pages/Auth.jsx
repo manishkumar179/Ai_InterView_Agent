@@ -71,7 +71,8 @@ const Auth = ({isModel = false}) => {
         <motion.button 
         onClick={handleGoogleAuth}
         whileHover={{opacity:0.9 , scale:1.03}}
-        whileTap={{opacity:1 , scale:0.98}}
+        whileTap={{opacity:1 , scale:0.98}} 
+
         className=" w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md " >
             <FcGoogle size={20}/>
             Continue with Google
@@ -83,3 +84,4 @@ const Auth = ({isModel = false}) => {
 };
 
 export default Auth;
+
