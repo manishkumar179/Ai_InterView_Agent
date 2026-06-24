@@ -10,8 +10,13 @@ import {
 } from "react-icons/fa";
 
 import { ServerUrl } from "../App.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../redux/userSlice.js";
 
 const Step1SetUp = ({ onStart }) => {
+  const { userData } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const [role, setRole] = useState("");
 
   const [experience, setExperience] = useState("");
@@ -59,6 +64,33 @@ const Step1SetUp = ({ onStart }) => {
     } catch (error) {
       console.log(error);
       setAnalyzing(false);
+    }
+  };
+
+  // Start Interview Button function
+  const handleStart = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        ServerUrl + "/api/interview/generate-questions",
+        { role, experience, mode, resumeText, projects, skills },
+        { withCredentials: true },
+      );
+
+      console.log(result.data);
+
+      if (userData) {
+        dispatch(
+          setUserData({ ...userData, credits: result.data.creditsLeft }),
+        );
+      }
+
+      setLoading(false);
+
+      onStart(result.data);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -258,11 +290,15 @@ const Step1SetUp = ({ onStart }) => {
 
                     <div className="flex flex-wrap gap-2 ">
                       {skills.map((s, i) => (
-                        <span key={i} className="bg-green-100 text-green-700 
-                        px-3 py-1 rounded-full text-sm ">{s}</span>
+                        <span
+                          key={i}
+                          className="bg-green-100 text-green-700 
+                        px-3 py-1 rounded-full text-sm "
+                        >
+                          {s}
+                        </span>
                       ))}
                     </div>
-
                   </div>
                 )}
               </motion.div>
@@ -270,14 +306,15 @@ const Step1SetUp = ({ onStart }) => {
 
             {/* Start Interview button */}
             <motion.button
-              disabled={!role || !experience}
+              onClick={handleStart}
+              disabled={!role || !experience || loading}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.95 }}
               className=" w-full disabled:bg-gray-600 bg-green-600
             hover:bg-green-700 text-white py-3 rounded-full text-lg font-semibold
             transition duration-300 shadow-md "
             >
-              Start Interview
+              {loading ? "Starting..." : "Start Interview"}
             </motion.button>
           </div>
         </motion.div>
