@@ -1,11 +1,53 @@
-import React from 'react'
+import React from "react";
+import maleVideo from "../assets/Videos/male-ai.mp4";
+import femaleVideo from "../assets/Videos/female-ai.mp4";
 
-const Step2Interview = ({interviewData, onFinish}) => {
+const Step2Interview = ({ interviewData, onFinish }) => {
+  const { interviewId, questions, userName } = interviewData;
+
   return (
-    <div>
-      <h1>Step 2 pag eme hai hm</h1>
-    </div>
-  )
-}
+    <div
+      className="min-h-screen bg-gradient-to-br from-emerald-50 via-white
+    to-teal-100 flex items-center justify-center p-4 sm:p-6 "
+    >
+      <div
+        className=" w-full mx-w-350 min-h-[80vh] bg-white rounded-3xl
+      shadow-2xl border border-gray-200 flex flex-col lg:flex-row
+      overflow-hidden "
+      >
+        {/* Video section */}
 
-export default Step2Interview
+        <div
+          className="w-full lg:w-[35%] bg-white flex flex-col items-center
+        p-6 space-y-6 border-r border-gray-200 "
+        >
+          <div
+            className="w-full max-w-max rounded-2xl overflow-hidden 
+          shadow-xl  "
+          >
+            <video
+              src={femaleVideo}
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+
+          {/* Subtitle Pending */}
+
+          {/* Timer area */}
+
+          <div className="w-full max-w-md bg-white border border-gray-200 
+          rounded-2xl shadow-md p-6 space-y-5  ">
+            <div className="flex justify-between items-center ">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Step2Interview;
