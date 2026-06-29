@@ -77,7 +77,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
   const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
 
   // Speak function
-  
+
   const speakText = (text) => {
     return new Promise((resolve) => {
       if (!window.speechSynthesis || !selectedVoice) {
@@ -121,6 +121,45 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     });
   };
 
+  useEffect(() => {
+    if (!selectedVoice) {
+      return;
+    }
+
+    const runIntro = async () => {
+      if (isIntroPhase) {
+        await speakText(
+          `Hi ${userName}, it's great to meet you today. I hope you're feeling
+          confident and ready.
+          `,
+        );
+
+        await speakText(
+          "I'll ask you a few questions. Just answer naturally, and take your time. Let's begin.",
+        );
+
+        setIsIntroPhase(false);
+      } else if (currentQuestion) {
+        await new Promise((r) => setTimeout(r, 800));
+
+        //If last question (hard level)
+        if (currentIndex === questions.length - 1) {
+          await speakText("Alright, this one might be a bit more challenging.");
+        }
+
+        await speakText(currentQuestion.question);
+      }
+    };
+
+    runIntro();
+  }, [selectedVoice, isIntroPhase, currentIndex]);
+
+
+  useEffect(()=>{
+    if(isIntroPhase) return;
+    
+  },[isIntroPhase]);
+
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-emerald-50 via-white
@@ -153,6 +192,20 @@ const Step2Interview = ({ interviewData, onFinish }) => {
           </div>
 
           {/* Subtitle Pending */}
+
+          {Subtitle && (
+            <div
+              className="w-full max-w-md bg-gray-50 border border-gray-200 
+            rounded-2xl p-4 shadow-sm "
+            >
+              <p
+                className="text-gray-700 text-sm sm:text-base font-medium
+              text-center leading-relaxed "
+              >
+                {Subtitle}
+              </p>
+            </div>
+          )}
 
           {/* Timer area */}
 
@@ -207,7 +260,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
             AI Smart Interview
           </h2>
 
-          <div
+          { !isIntroPhase && ( <div
             className="relative mb-6 bg-gray-50 p-4 sm:p-6 
             rounded-2xl border border-gray-200 shadow-sm "
           >
@@ -220,8 +273,9 @@ const Step2Interview = ({ interviewData, onFinish }) => {
             >
               {currentQuestion?.question}
             </div>
-          </div>
+          </div>)}
 
+          {/* Text area */}
           <textarea
             placeholder="Type your answer here..."
             className="flex-1 bg-gray-100 p-4 sm:p-6 rounded-2xl resize-none
