@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import maleVideo from "../assets/Videos/male-ai.mp4";
 import femaleVideo from "../assets/Videos/female-ai.mp4";
 import Timer from "./Timer.jsx";
-import { motion } from "motion/react";
+import { motion, time } from "motion/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 
 const Step2Interview = ({ interviewData, onFinish }) => {
@@ -101,6 +101,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
       utterance.onstart = () => {
         setIsAIPlaying(true);
+        stopMic()
         videoRef.current?.play();
       };
 
@@ -108,6 +109,10 @@ const Step2Interview = ({ interviewData, onFinish }) => {
         videoRef.current?.pause();
         videoRef.current.currentTime = 0;
         setIsAIPlaying(false);
+
+        if(isMicOn){
+          startMic()
+        }
 
         setTimeout(() => {
           setSubtitle("");
@@ -126,6 +131,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
       return;
     }
 
+    //Start intro before interview
     const runIntro = async () => {
       if (isIntroPhase) {
         await speakText(
@@ -148,17 +154,76 @@ const Step2Interview = ({ interviewData, onFinish }) => {
         }
 
         await speakText(currentQuestion.question);
+
+        if(isMicOn){
+          startMic()
+        }
       }
     };
 
     runIntro();
   }, [selectedVoice, isIntroPhase, currentIndex]);
 
+  //  Timer function
+  useEffect(() => {
+    if (isIntroPhase) return;
+    if (!currentQuestion) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  useEffect(()=>{
-    if(isIntroPhase) return;
-    
-  },[isIntroPhase]);
+    return () => clearInterval(timer);
+  }, [isIntroPhase, currentIndex]);
+
+  // Change voice into text and write it on textarea
+
+  useEffect(() => {
+    if (!("webKitSpeechRecognition" in window)) return;
+
+    const recognition = new window.webKitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+
+      setAnswer((prev) => prev + " " + transcript);
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const startMic = () => {
+    if (recognitionRef.current && !isAIPlaying) {
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.log("Error in start mic", error);
+      }
+    }
+  };
+
+  const stopMic = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const toggleMic = () => {
+    if (isMicOn) {
+      stopMic();
+    } else {
+      startMic();
+    }
+    setIsMicOn(!isMicOn);
+  };
 
   return (
     <div
@@ -228,7 +293,10 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
             {/* Timer bar */}
             <div className="flex justify-center ">
-              <Timer timeLeft="30" totalTime="60" />
+              <Timer
+                timeLeft={timeLeft}
+                totalTime={currentQuestion?.timeLimit}
+              />
             </div>
 
             <div className="h-px bg-gray-200 "></div>
@@ -260,24 +328,28 @@ const Step2Interview = ({ interviewData, onFinish }) => {
             AI Smart Interview
           </h2>
 
-          { !isIntroPhase && ( <div
-            className="relative mb-6 bg-gray-50 p-4 sm:p-6 
-            rounded-2xl border border-gray-200 shadow-sm "
-          >
-            <p className="text-xs sm:text-sm text-gray-400 mb-2 ">
-              Question {currentIndex + 1} of {questions.length}
-            </p>
+          {!isIntroPhase && (
             <div
-              className="text-base sm:text-lg font-semibold text-gray-800
-            leading-relaxed  "
+              className="relative mb-6 bg-gray-50 p-4 sm:p-6 
+            rounded-2xl border border-gray-200 shadow-sm "
             >
-              {currentQuestion?.question}
+              <p className="text-xs sm:text-sm text-gray-400 mb-2 ">
+                Question {currentIndex + 1} of {questions.length}
+              </p>
+              <div
+                className="text-base sm:text-lg font-semibold text-gray-800
+            leading-relaxed  "
+              >
+                {currentQuestion?.question}
+              </div>
             </div>
-          </div>)}
+          )}
 
           {/* Text area */}
           <textarea
             placeholder="Type your answer here..."
+            onChange={(e) => setAnswer(e.target.value)}
+            value={answer}
             className="flex-1 bg-gray-100 p-4 sm:p-6 rounded-2xl resize-none
           outline-none border border-gray-200 focus:ring-2
           focus:ring-emerald-500 transition text-gray-800 "
@@ -286,6 +358,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
           <div className="flex items-center gap-4 mt-6 ">
             {/* Microphone button */}
             <motion.button
+              onClick={toggleMic}
               whileTap={{ scale: 0.9 }}
               className="w-12 h-12 sm:w-14 sm:h-14 flex 
             items-center justify-center rounded-full bg-black text-white
