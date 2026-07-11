@@ -4,6 +4,9 @@ import femaleVideo from "../assets/Videos/female-ai.mp4";
 import Timer from "./Timer.jsx";
 import { motion, time } from "motion/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import axios from "axios";
+import { ServerUrl } from "../App.jsx";
+import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 
 const Step2Interview = ({ interviewData, onFinish }) => {
   const { interviewId, questions, userName } = interviewData;
@@ -101,7 +104,7 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
       utterance.onstart = () => {
         setIsAIPlaying(true);
-        stopMic()
+        stopMic();
         videoRef.current?.play();
       };
 
@@ -110,8 +113,8 @@ const Step2Interview = ({ interviewData, onFinish }) => {
         videoRef.current.currentTime = 0;
         setIsAIPlaying(false);
 
-        if(isMicOn){
-          startMic()
+        if (isMicOn) {
+          startMic();
         }
 
         setTimeout(() => {
@@ -155,8 +158,8 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
         await speakText(currentQuestion.question);
 
-        if(isMicOn){
-          startMic()
+        if (isMicOn) {
+          startMic();
         }
       }
     };
@@ -179,7 +182,13 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isIntroPhase, currentIndex]);
+  }, [isIntroPhase, currentIndex,]);
+
+  useEffect(()=>{
+    if(!isIntroPhase && currentQuestion){
+      setTimeLeft(currentQuestion.timeLimit || 60)
+    }
+  },[currentIndex])
 
   // Change voice into text and write it on textarea
 
@@ -224,6 +233,93 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     }
     setIsMicOn(!isMicOn);
   };
+
+
+  // Submit answer button
+  const submitAnswer = async () => {
+    if (isSubmitting) return;
+    stopMic();
+    setIsSubmitting(true);
+
+    try {
+      const result = await axios.post(
+        ServerUrl + "/api/interview/submit-answer",
+        { 
+          interviewId, 
+          questionIndex: currentIndex, 
+          answer, 
+          timeTaken:currentQuestion.timeLimit - timeLeft },
+          {withCredentials:true}
+      );
+
+      setFeedback(result.data.feedback)
+      speakText(result.data.feedback)
+      setIsSubmitting(false)
+    } catch (error) {
+      console.log(error)
+      setIsSubmitting(false)
+    }
+  };
+
+  // Next question function
+  const handleNext  = async ()=>{
+    setAnswer("")
+    setFeedback("")
+
+    if(currentIndex + 1 >= questions.length ){
+      finishInterview();
+      return;
+    }
+
+    await speakText("Alright, let's move to the next question.");
+
+    setCurrentIndex(currentIndex + 1);
+
+    setTimeout(()=>{
+      if(isMicOn) startMic();
+    },500);
+
+
+  }
+
+  // Finish interview function
+  const finishInterview = async ()=>{
+    stopMic()
+    setIsMicOn(false)
+    try {
+      const result = await axios.post(ServerUrl + "/api/interview/finish" ,
+        {
+          interviewId
+        },
+        {withCredentials:true}
+      )
+      console.log(result.data)
+      onFinish(result.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(()=>{
+    if(isIntroPhase) return
+    if(!currentQuestion) return
+
+    if(timeLeft === 0 && !isSubmitting && !feedback){
+      submitAnswer()
+    }
+  },[timeLeft]);
+
+  useEffect(()=>{
+    return ()=>{
+      if(recognitionRef.current){
+        recognitionRef.current.stop();
+        recognitionRef.current.abort();
+      }
+
+      window.speechSynthesis.cancel()
+    }
+  },[])
+
 
   return (
     <div
@@ -355,7 +451,9 @@ const Step2Interview = ({ interviewData, onFinish }) => {
           focus:ring-emerald-500 transition text-gray-800 "
           />
 
-          <div className="flex items-center gap-4 mt-6 ">
+          {/*  Microphone and submit button */}
+
+          {!feedback ? ( <div className="flex items-center gap-4 mt-6 ">
             {/* Microphone button */}
             <motion.button
               onClick={toggleMic}
@@ -364,19 +462,41 @@ const Step2Interview = ({ interviewData, onFinish }) => {
             items-center justify-center rounded-full bg-black text-white
             shadow-lg "
             >
-              <FaMicrophone size={20} />
+              {isMicOn ? <FaMicrophone size={20} /> : <FaMicrophoneSlash size={20}/>}
             </motion.button>
 
             {/* Submit Answer button */}
             <motion.button
+            onClick={submitAnswer}
+            disabled={isSubmitting}
               whileTap={{ scale: 0.95 }}
               className="flex-1 bg-gradient-to-r from-emerald-600
             to-teal-500 text-white py-3 sm:py-4 rounded-2xl shadow-lg
-            hover:opacity-90 transition font-semibold "
+            hover:opacity-90 transition font-semibold disabled:bg-gray-500 "
             >
-              Submit Answer
+              {isSubmitting?"Submitting..." :"Submit Answer"}
+
+              {/* feedback & Click for next question */}
             </motion.button>
-          </div>
+          </div>): (
+            <motion.div 
+            initial={{opacity:0}}
+            animate={{opacity:1}}
+            className="mt-6 bg-emerald-50 border 
+            border-emerald-200 p-5 rounded-2xl shadow-sm">
+              <p className="text-emerald-700 font-medium mb-4 " >{feedback}</p>
+
+              <button 
+              onClick={handleNext}
+              className=" w-full bg-gradient-to-r from-emerald-600
+              to-teal-500 text-white py-3 rounded-xl shadow-md
+              hover:opacity-90 transition flex items-center justify-center gap-1 " >
+                Next Question <BsArrowRight size={18}/>
+              </button> 
+            </motion.div>
+          )}
+
+
         </div>
       </div>
     </div>
