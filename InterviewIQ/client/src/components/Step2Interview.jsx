@@ -182,20 +182,20 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isIntroPhase, currentIndex,]);
+  }, [isIntroPhase, currentIndex]);
 
-  useEffect(()=>{
-    if(!isIntroPhase && currentQuestion){
-      setTimeLeft(currentQuestion.timeLimit || 60)
+  useEffect(() => {
+    if (!isIntroPhase && currentQuestion) {
+      setTimeLeft(currentQuestion.timeLimit || 60);
     }
-  },[currentIndex])
+  }, [currentIndex]);
 
   // Change voice into text and write it on textarea
 
   useEffect(() => {
-    if (!("webKitSpeechRecognition" in window)) return;
+    if (!("webkitSpeechRecognition" in window)) return;
 
-    const recognition = new window.webKitSpeechRecognition();
+    const recognition = new window.webkitSpeechRecognition();
     recognition.lang = "en-US";
     recognition.continuous = true;
     recognition.interimResults = false;
@@ -204,6 +204,9 @@ const Step2Interview = ({ interviewData, onFinish }) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
 
       setAnswer((prev) => prev + " " + transcript);
+
+      console.log(window.SpeechRecognition);
+      console.log(window.webkitSpeechRecognition);
     };
 
     recognitionRef.current = recognition;
@@ -234,7 +237,6 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     setIsMicOn(!isMicOn);
   };
 
-
   // Submit answer button
   const submitAnswer = async () => {
     if (isSubmitting) return;
@@ -244,29 +246,30 @@ const Step2Interview = ({ interviewData, onFinish }) => {
     try {
       const result = await axios.post(
         ServerUrl + "/api/interview/submit-answer",
-        { 
-          interviewId, 
-          questionIndex: currentIndex, 
-          answer, 
-          timeTaken:currentQuestion.timeLimit - timeLeft },
-          {withCredentials:true}
+        {
+          interviewId,
+          questionIndex: currentIndex,
+          answer,
+          timeTaken: currentQuestion.timeLimit - timeLeft,
+        },
+        { withCredentials: true },
       );
 
-      setFeedback(result.data.feedback)
-      speakText(result.data.feedback)
-      setIsSubmitting(false)
+      setFeedback(result.data.feedback);
+      speakText(result.data.feedback);
+      setIsSubmitting(false);
     } catch (error) {
-      console.log(error)
-      setIsSubmitting(false)
+      console.log(error);
+      setIsSubmitting(false);
     }
   };
 
   // Next question function
-  const handleNext  = async ()=>{
-    setAnswer("")
-    setFeedback("")
+  const handleNext = async () => {
+    setAnswer("");
+    setFeedback("");
 
-    if(currentIndex + 1 >= questions.length ){
+    if (currentIndex + 1 >= questions.length) {
       finishInterview();
       return;
     }
@@ -275,51 +278,49 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
     setCurrentIndex(currentIndex + 1);
 
-    setTimeout(()=>{
-      if(isMicOn) startMic();
-    },500);
-
-
-  }
+    setTimeout(() => {
+      if (isMicOn) startMic();
+    }, 500);
+  };
 
   // Finish interview function
-  const finishInterview = async ()=>{
-    stopMic()
-    setIsMicOn(false)
+  const finishInterview = async () => {
+    stopMic();
+    setIsMicOn(false);
     try {
-      const result = await axios.post(ServerUrl + "/api/interview/finish" ,
+      const result = await axios.post(
+        ServerUrl + "/api/interview/finish",
         {
-          interviewId
+          interviewId,
         },
-        {withCredentials:true}
-      )
-      console.log(result.data)
-      onFinish(result.data)
+        { withCredentials: true },
+      );
+      console.log(result.data);
+      onFinish(result.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  useEffect(()=>{
-    if(isIntroPhase) return
-    if(!currentQuestion) return
+  useEffect(() => {
+    if (isIntroPhase) return;
+    if (!currentQuestion) return;
 
-    if(timeLeft === 0 && !isSubmitting && !feedback){
-      submitAnswer()
+    if (timeLeft === 0 && !isSubmitting && !feedback) {
+      submitAnswer();
     }
-  },[timeLeft]);
+  }, [timeLeft]);
 
-  useEffect(()=>{
-    return ()=>{
-      if(recognitionRef.current){
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
         recognitionRef.current.stop();
         recognitionRef.current.abort();
       }
 
-      window.speechSynthesis.cancel()
-    }
-  },[])
-
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   return (
     <div
@@ -453,50 +454,56 @@ const Step2Interview = ({ interviewData, onFinish }) => {
 
           {/*  Microphone and submit button */}
 
-          {!feedback ? ( <div className="flex items-center gap-4 mt-6 ">
-            {/* Microphone button */}
-            <motion.button
-              onClick={toggleMic}
-              whileTap={{ scale: 0.9 }}
-              className="w-12 h-12 sm:w-14 sm:h-14 flex 
+          {!feedback ? (
+            <div className="flex items-center gap-4 mt-6 ">
+              {/* Microphone button */}
+              <motion.button
+                onClick={toggleMic}
+                whileTap={{ scale: 0.9 }}
+                className="w-12 h-12 sm:w-14 sm:h-14 flex 
             items-center justify-center rounded-full bg-black text-white
             shadow-lg "
-            >
-              {isMicOn ? <FaMicrophone size={20} /> : <FaMicrophoneSlash size={20}/>}
-            </motion.button>
+              >
+                {isMicOn ? (
+                  <FaMicrophone size={20} />
+                ) : (
+                  <FaMicrophoneSlash size={20} />
+                )}
+              </motion.button>
 
-            {/* Submit Answer button */}
-            <motion.button
-            onClick={submitAnswer}
-            disabled={isSubmitting}
-              whileTap={{ scale: 0.95 }}
-              className="flex-1 bg-gradient-to-r from-emerald-600
+              {/* Submit Answer button */}
+              <motion.button
+                onClick={submitAnswer}
+                disabled={isSubmitting}
+                whileTap={{ scale: 0.95 }}
+                className="flex-1 bg-gradient-to-r from-emerald-600
             to-teal-500 text-white py-3 sm:py-4 rounded-2xl shadow-lg
             hover:opacity-90 transition font-semibold disabled:bg-gray-500 "
+              >
+                {isSubmitting ? "Submitting..." : "Submit Answer"}
+
+                {/* feedback & Click for next question */}
+              </motion.button>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-6 bg-emerald-50 border 
+            border-emerald-200 p-5 rounded-2xl shadow-sm"
             >
-              {isSubmitting?"Submitting..." :"Submit Answer"}
+              <p className="text-emerald-700 font-medium mb-4 ">{feedback}</p>
 
-              {/* feedback & Click for next question */}
-            </motion.button>
-          </div>): (
-            <motion.div 
-            initial={{opacity:0}}
-            animate={{opacity:1}}
-            className="mt-6 bg-emerald-50 border 
-            border-emerald-200 p-5 rounded-2xl shadow-sm">
-              <p className="text-emerald-700 font-medium mb-4 " >{feedback}</p>
-
-              <button 
-              onClick={handleNext}
-              className=" w-full bg-gradient-to-r from-emerald-600
+              <button
+                onClick={handleNext}
+                className=" w-full bg-gradient-to-r from-emerald-600
               to-teal-500 text-white py-3 rounded-xl shadow-md
-              hover:opacity-90 transition flex items-center justify-center gap-1 " >
-                Next Question <BsArrowRight size={18}/>
-              </button> 
+              hover:opacity-90 transition flex items-center justify-center gap-1 "
+              >
+                Next Question <BsArrowRight size={18} />
+              </button>
             </motion.div>
           )}
-
-
         </div>
       </div>
     </div>
