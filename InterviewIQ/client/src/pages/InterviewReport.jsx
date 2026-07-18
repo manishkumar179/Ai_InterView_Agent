@@ -3,7 +3,7 @@ import React from 'react'
 const InterviewReport = () => {
   return (
     <div>
-      Interview report apge
+      Interview report page
     </div>
   )
 }

@@ -58,11 +58,55 @@ const InterviewHistory = () => {
         ) : (
           <div className=" grid gap-6  ">
             {interviews.map((item, index) => (
-              <div key={index}
+              <div
+                key={index}
+                onClick={()=>navigate(`/report/${item._id}`)}
                 className=" bg-white p-6 rounded-2xl shadow-md hover:shadow-xl
-          transition-all duration-300 cursor-pointer border
-          border-gray-100 "
-              ></div>
+                transition-all duration-300 cursor-pointer border
+               border-gray-100 "
+              >
+                <div
+                  className=" flex flex-col md:flex-row md:items-center
+                md:justify-between gap-4 "
+                >
+                  {/* Left div */}
+                  <div>
+                    <h3 className=" text-lg font-semibold text-gray-800 ">
+                      {item.role}
+                    </h3>
+                    <p className=" text-gray-500 text-sm mt-1 ">
+                      {item.experience} {item.mode}{" "}
+                    </p>
+                    <p className=" text-xs text-gray-400 mt-2 ">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  {/* Right div */}
+                  <div className=" flex items-center gap-6 ">
+                    {/* Score */}
+                    <div className=" text-right ">
+                      <p className=" text-xl font-bold text-emerald-600 ">
+                        {item.finalScore || 0}/10
+                      </p>
+                      <p className=" text-xs text-gray-400 ">Overall Score</p>
+                    </div>
+
+                    {/* STATUS BADGE */}
+
+                    <span
+                      className={` px-4 py-1 rounded-full text-xs font-medium 
+                    ${
+                      item.status === "completed"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : " bg-yellow-100 text-yellow-700 "
+                    } `}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
