@@ -33,7 +33,9 @@ const InterviewHistory = () => {
       <div className="w-[90vw] lg:w-[70vw] max-w-[90%] mx-auto ">
         {/* Heading */}
         <div className=" mb-10 w-full flex items-start gap-4 ">
-          <button className=" mb-1 p-3 rounded-full bg-white shadow hover:shadow-md transition  ">
+          <button
+          onClick={()=>navigate("/")}
+          className=" mb-1 p-3 rounded-full bg-white shadow hover:shadow-md transition  ">
             {" "}
             <FaArrowLeft className=" text-gray-600 " />{" "}
           </button>
