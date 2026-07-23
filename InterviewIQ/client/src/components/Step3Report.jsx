@@ -47,6 +47,8 @@ const Step3Report = ({ report }) => {
     ((performanceText = "Significant improvement required. "),
       (shortTagline = "Work on clarity and confidence. "));
   }
+  const score = finalScore;
+  const percentage = (score/10)*100;
 
   return (
     <div
@@ -87,27 +89,89 @@ const Step3Report = ({ report }) => {
         </button>
       </div>
 
+      {/* Progress Bar of report */}
+
       <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 ">
         <div className="space-y-6">
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className=" bg-white rounded-2xl sm:rounded-3xl shadow-lg p-6
         sm:p-8 text-center "
           >
-            <div className=" w-20 h-20 ">
+            <h3 className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base ">
+              Overall Performance
+            </h3>
+            <div className="relative w-20 h-20 sm:w-25 sm:h-25 mx-auto ">
               <CircularProgressbar
                 value={percentage}
-                text={`${timeLeft}s`}
+                text={`${score}/10`}
                 styles={buildStyles({
-                  textSize: "28px",
+                  textSize: "18px",
                   pathColorz: "#10b981",
                   textColor: "#ef4444",
                   trailColor: "#e5e7eb",
                 })}
               />
             </div>
+
+            <p className="text-gray-400 mt-3 text-xs sm:text-sm  ">
+              Out of 10
+            </p>
+
+            <div className=" mt-4 ">
+              <p className="font-semibold text-gray-800 text-sm sm:text-base ">
+                {performanceText}
+              </p>
+              <p className="text-gray-500 text-xs sm:text-sm mt-1 ">
+                {shortTagline}
+              </p>
+            </div>
+
+
           </motion.div>
+
+          <motion.div 
+          initial={{opacity:0}}
+          animate={{opacity:1}}
+          className=" bg-white rounded-2xl sm:rounded-3xl shadow-lg
+          p-6 sm:p-8 ">
+            <h3 className=" text-base sm:text-lg font-semibold text-gray-700
+            mb-6 ">
+              Skill Evaluation
+            </h3>
+
+            <div className=" space-y-5 ">
+              {
+                skills.map((s,i)=>(
+                  <div key={i}>
+                    <div className="flex justify-between mb-2 text-sm 
+                    sm:text-base ">
+                      <span>{s.label}</span>
+                      <span className="font-semibold text-green-600  ">{s.value}</span>
+                    </div>
+
+                    <div className=" bg-gray-200 h-2 sm:h-3 rounded-full ">
+                      <div className=" bg-green-500 h-full rounded-full "
+                      style={{width:`${s.value*10}%`}}>
+                        
+                      </div>
+                    </div> 
+
+
+
+
+                  </div>
+                ))
+              }
+            </div>
+
+
+          </motion.div>
+
+
+
         </div>
 
         <div></div>
