@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion, scale } from "motion/react";
 
@@ -113,8 +113,10 @@ const Pricing = () => {
 
               {/* Default Tag */}
               {plan.default && (
-                <div className=" absolute top-6 right-6 bg-gray-200
-                text-gray-700 text-xs px-3 py-1 rounded-full ">
+                <div
+                  className=" absolute top-6 right-6 bg-gray-200
+                text-gray-700 text-xs px-3 py-1 rounded-full "
+                >
                   Default
                 </div>
               )}
@@ -131,19 +133,42 @@ const Pricing = () => {
                   {plan.price}
                 </span>
 
-                <p className=" text-gray-500 mt-1 ">
-                  {plan.credits} Credits
-                </p>
-
+                <p className=" text-gray-500 mt-1 ">{plan.credits} Credits</p>
               </div>
 
               {/* Description */}
 
-              <p className="  ">
-
+              <p className="text-gray-500 mt-4 text-sm leading-relaxed  ">
+                {plan.description}
               </p>
 
+              {/* Features */}
 
+              <div className=" mt-6 space-y-3 text-left ">
+                {plan.features.map((feature, i) => (
+                  <div key={i} className=" flex items-center gap-3 ">
+                    <FaCheckCircle className=" text-emerald-500 text-sm " />
+                    <span className=" text-gray-700 text-sm ">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {!plan.default && (
+                <button
+                  className={` w-full mt-8 py-3 rounded-xl font-semibold 
+                transition ${
+                  isSelected
+                    ? "bg-emerald-600 text-white hover:capacity-90 "
+                    : "bg-gray-100 text-gray-700 hover:bg-emerald-50 "
+                } `}
+                >
+                  {
+                    isSelected ? "Proceed to Pay" : "Selected plan"
+                  }
+
+
+                </button>
+              )}
             </motion.div>
           );
         })}
