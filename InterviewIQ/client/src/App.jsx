@@ -23,7 +23,7 @@ const App = () => {
           withCredentials: true,
         });
 
-        dispatch(setUserData(result.data));
+        dispatch(setUserData(result.data.user));
 
         console.log(result.data.user);
       } catch (error) {

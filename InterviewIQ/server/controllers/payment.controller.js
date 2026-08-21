@@ -21,7 +21,7 @@ export const createOrder = async (req, res) =>{
             receipt:`receipt_${Date.now()}`
         }
         
-        const order = await razorpay.order.create(options)
+        const order = await razorpay.orders.create(options)
 
         await Payment.create({
             userId:req.userId,

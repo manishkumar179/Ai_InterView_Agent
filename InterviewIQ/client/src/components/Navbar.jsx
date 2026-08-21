@@ -12,6 +12,8 @@ import AuthModel from "./AuthModel";
 
 const Navbar = () => {
   const { userData } = useSelector((state) => state.user);
+  
+  console.log("NAVBAR USER DATA:", userData);
   // console.log( "userdata ---" , userData)
   let navigate = useNavigate()
   let dispatch = useDispatch()
@@ -63,7 +65,7 @@ const Navbar = () => {
             }} className=" flex items-center gap-2 bg-gray-100 px-4 py-2 
             rounded-full text-md hover:bg-gray-200 transition ">
                 <BsCoin size={20} />
-                {userData?.user.credits || 0 }
+                {userData?.credits || 0 }
             </button>
 
             {/* Credit popup */}
@@ -88,7 +90,8 @@ const Navbar = () => {
               setShowCreditPopup(false);
             }} className=" w-9 h-9 bg-black text-white rounded-full
              flex items-center justify-center font-semibold ">
-                {userData ? userData.user.name.slice(0,1).toUpperCase() : <FaUserAstronaut size={16}/>  }
+                {userData ? 
+                userData.name?.slice(0,1).toUpperCase() : <FaUserAstronaut size={16}/>  }
             </button>
 
 
@@ -97,7 +100,7 @@ const Navbar = () => {
 
               <div className=" absolute right-0 mt-3 w-48 bg-white shadow-xl border border-gray-200 rounded-xl p-4 z-50 " >
 
-                <p className="text-md text-blue-500 font-medium mb-1">{userData?.user.name}</p>
+                <p className="text-md text-blue-500 font-medium mb-1">{userData?.name}</p>
                 <button onClick={()=>navigate("/history")} className="w-ful text-left text-sm py-2 hover:text-black text-gray-600 " > Interview History </button>
                 <button onClick={handleLogout} className=" w-ful text-left text-sm py-2 flex items-center gap-2 text-red-500   " >
                   <HiOutlineLogout size={16} />
