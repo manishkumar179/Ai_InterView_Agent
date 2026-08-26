@@ -15,7 +15,7 @@ let app = express()
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:"https://ai-interview-agent-client-hb8r.onrender.com",
     credentials:true
 }))
 
