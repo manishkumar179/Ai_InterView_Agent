@@ -1,22 +1,46 @@
-
 import { createBrowserRouter } from "react-router";
-import { RouterProvider } from "react-router/dom";
+
 import Login from "./auth/pages/Login";
 import Register from "./auth/pages/Register";
+import Home from "./auth/components/Home";
+
+import ProtectedRoute from "./auth/components/ProtectedRoute";
+import PublicRoute from "./auth/components/PublicRoute";
 
 
-export let router = createBrowserRouter([
+export const router = createBrowserRouter([
+
+    // =========================
+    // PUBLIC ROUTES
+    // =========================
+
     {
-        path:"/",
-        element:<Login/>
+        element: <PublicRoute />,
+        children: [
+            {
+                path: "/",
+                element: <Login />
+            },
+            {
+                path: "/register",
+                element: <Register />
+            }
+        ]
     },
+
+
+    // =========================
+    // PROTECTED ROUTES
+    // =========================
+
     {
-        path:"/register",
-        element:<Register/>
+        element: <ProtectedRoute />,
+        children: [
+            {
+                path: "/home",
+                element: <Home />
+            }
+        ]
     }
 
-])
-
-
-
-
+]);
